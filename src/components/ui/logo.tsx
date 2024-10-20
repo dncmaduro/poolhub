@@ -5,8 +5,6 @@ interface LogoProps {
 }
 
 const Logo = (props: LogoProps) => {
-  console.log(process.env.NEXT_PUBLIC_SUPABASE_KEY)
-
   return (
     <Link href="/">
       <h1 className={`text-xl font-bold ${props.className} text-violet-500`}>
