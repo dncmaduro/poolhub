@@ -26,20 +26,22 @@ const Page = () => {
 
   const schema = z.object({
     email: z.string().email('Sai định dạng email'),
-    password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 kí tự ')
+    password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 kí tự '),
+    name: z.string().min(1, 'Phải điền tên cho tài khoản')
   })
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       email: '',
-      password: ''
+      password: '',
+      name: ''
     }
   })
 
   const submit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true)
-    await register(values.email, values.password)
+    await register(values.email, values.password, values.name)
     setIsLoading(false)
   }
 
@@ -88,6 +90,21 @@ const Page = () => {
                     >
                       {isShowPw ? <Eye /> : <EyeClosed />}
                     </Button>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="mt-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tên</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nhập tên của bạn..." {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
