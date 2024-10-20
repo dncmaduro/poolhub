@@ -16,12 +16,13 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useAuth } from '@/hooks/use-auth'
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Eye, EyeClosed } from 'lucide-react'
 import Link from 'next/link'
 
 const Page = () => {
   const { register } = useAuth()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isShowPw, setIsShowPw] = useState<boolean>(false)
 
   const schema = z.object({
     email: z.string().email('Sai định dạng email'),
@@ -70,11 +71,23 @@ const Page = () => {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="relative">
                     <FormLabel>Mật khẩu</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nhập mật khẩu..." {...field} />
+                      <Input
+                        type={isShowPw ? 'text' : 'password'}
+                        placeholder="Nhập mật khẩu..."
+                        {...field}
+                      />
                     </FormControl>
+                    <Button
+                      type="button"
+                      onClick={() => setIsShowPw(!isShowPw)}
+                      variant="ghost"
+                      className="absolute right-0 top-6"
+                    >
+                      {isShowPw ? <Eye /> : <EyeClosed />}
+                    </Button>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -90,7 +103,7 @@ const Page = () => {
             </Button>
           </form>
           <Link href="/login" className="mt-4 flex w-full justify-center">
-            <Button variant="link">Or you can login here</Button>
+            <Button variant="link">Hoặc bạn có thể đăng nhập tại đây</Button>
           </Link>
         </Form>
       </div>
