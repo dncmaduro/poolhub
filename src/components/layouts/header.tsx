@@ -5,18 +5,85 @@ import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle
+} from '@/components/ui/navigation-menu'
+import Link from 'next/link'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
 const Header = () => {
   const name = useSelector((state: RootState) => state.profile.name)
+  const menu = [
+    {
+      label: 'Xếp hạng',
+      href: '/rankings'
+    },
+    {
+      label: 'Trận đấu',
+      href: '/matches'
+    },
+    {
+      label: 'Câu lạc bộ',
+      href: '/clubs'
+    }
+  ]
 
   return (
-    <div className="flex h-14 w-full items-center justify-between border border-gray-300 bg-white px-4 shadow-sm">
+    <div className="flex h-14 w-full items-center justify-between rounded-b-2xl border border-gray-300 bg-white px-4 shadow-sm">
       <Logo />
       <div className="flex items-center gap-2">
-        <Button size="sm" variant="outline">
-          {name}
-          <ChevronDown className="h-3 w-3" />
-        </Button>
+        <NavigationMenu>
+          <NavigationMenuList>
+            {menu.map((item) => (
+              <NavigationMenuItem key={item.label}>
+                <Link href={item.href} legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    {item.label}
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline">
+              {name}
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[120px]">
+            <Link href="/profile">
+              <Button variant="ghost" size="sm" className="w-full">
+                Hồ sơ
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-red-500 hover:text-red-500"
+            >
+              Đăng xuất
+            </Button>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )
