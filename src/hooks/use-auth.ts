@@ -28,5 +28,32 @@ export const useAuth = () => {
     }
   }
 
-  return { register }
+  const login = async (email: string, password: string) => {
+    const { data, error } = await supabase
+      .from('account')
+      .select('*')
+      .eq('email', email)
+    if (data) {
+      const res = data[0]
+      if (res.password === password) {
+        toast({
+          title: 'Đăng nhập thành công'
+        })
+      } else {
+        toast({
+          title: 'Đăng nhập thất bại',
+          description: 'Sai mật khẩu',
+          variant: 'destructive'
+        })
+      }
+    } else {
+      toast({
+        title: 'Đăng nhập thất bại',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { register, login }
 }
