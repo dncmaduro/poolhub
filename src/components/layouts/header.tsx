@@ -21,6 +21,7 @@ import {
 
 const Header = () => {
   const name = useSelector((state: RootState) => state.profile.name)
+  const role = useSelector((state: RootState) => state.profile.role)
   const menu = [
     {
       label: 'Xếp hạng',
@@ -33,6 +34,16 @@ const Header = () => {
     {
       label: 'Câu lạc bộ',
       href: '/clubs'
+    },
+    {
+      label: 'Quản lý câu lạc bộ',
+      href: '/ownclub',
+      role: 'host'
+    },
+    {
+      label: 'Quản lý tài khoản',
+      href: '/accounts',
+      role: 'admin'
     }
   ]
 
@@ -43,13 +54,19 @@ const Header = () => {
         <NavigationMenu>
           <NavigationMenuList>
             {menu.map((item) => (
-              <NavigationMenuItem key={item.label}>
-                <Link href={item.href} legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    {item.label}
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
+              <>
+                {(!item.role || item.role === role) && (
+                  <NavigationMenuItem key={item.label}>
+                    <Link href={item.href} legacyBehavior passHref>
+                      <NavigationMenuLink
+                        className={navigationMenuTriggerStyle()}
+                      >
+                        {item.label}
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                )}
+              </>
             ))}
           </NavigationMenuList>
         </NavigationMenu>
