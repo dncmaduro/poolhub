@@ -9,7 +9,7 @@ const MainLayout = (props: MainLayoutProps) => {
   return (
     <div className="h-screen w-screen">
       <Header />
-      <div>{props.children}</div>
+      <div className="w-full">{props.children}</div>
     </div>
   )
 }

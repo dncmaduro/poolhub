@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import ThemeText from '@/components/ui/themeText'
+import ThemeText from '@/components/ui/theme-text'
 import Link from 'next/link'
 
 export default function Home() {
