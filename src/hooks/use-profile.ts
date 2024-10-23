@@ -35,5 +35,12 @@ export const useProfile = () => {
     }
   }
 
-  return { createProfile, getProfile }
+  const getProfileById = async (id: number) => {
+    const { data } = await supabase.from('profile').select('*').eq('id', id)
+    if (data) {
+      return data[0]
+    }
+  }
+
+  return { createProfile, getProfile, getProfileById }
 }
