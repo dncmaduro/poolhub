@@ -53,9 +53,9 @@ const Header = () => {
       <div className="flex items-center gap-2">
         <NavigationMenu>
           <NavigationMenuList>
-            {menu.map((item) => (
-              <>
-                {(!item.role || item.role === role) && (
+            {menu.map((item) => {
+              return (
+                (!item.role || item.role === role) && (
                   <NavigationMenuItem key={item.label}>
                     <Link href={item.href} legacyBehavior passHref>
                       <NavigationMenuLink
@@ -65,9 +65,9 @@ const Header = () => {
                       </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
-                )}
-              </>
-            ))}
+                )
+              )
+            })}
           </NavigationMenuList>
         </NavigationMenu>
         <DropdownMenu>

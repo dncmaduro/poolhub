@@ -1,38 +1,57 @@
 'use client'
 
-import { ClubBlock, ClubBlockProps } from '@/components/home/club-block'
+import { ClubBlock } from '@/components/home/club-block'
+import { CompetitionBlock } from '@/components/home/competition-block'
 import FeedBlock from '@/components/ui/feed-block'
 import { useClub } from '@/hooks/use-club'
+import { useCompetition } from '@/hooks/use-competition'
 import MainLayout from '@/layouts/main'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 const Page = () => {
-  const [clubs, setClubs] = useState<ClubBlockProps[]>([])
+  const [clubBlocks, setClubBlocks] = useState<ReactNode[]>([])
+  const [competitionBlocks, setCompetitionBlocks] = useState<ReactNode[]>([])
 
   const { getClubs } = useClub()
-
-  const clubBlocks = () => {
-    return clubs.map((club) => (
-      <ClubBlock
-        id={club.id}
-        key={club.id}
-        name={club.name}
-        address={club.address}
-        email={club.email}
-      />
-    ))
-  }
+  const { getCompetitions } = useCompetition()
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchClubData = async () => {
       const res = await getClubs()
       if (res) {
-        setClubs(res)
+        setClubBlocks(
+          res.map((block) => (
+            <ClubBlock
+              key={block.id}
+              id={block.id}
+              name={block.name}
+              address={block.address}
+              email={block.email}
+            />
+          ))
+        )
       }
     }
 
-    fetchData()
-  }, [getClubs])
+    const fetchCompetitionData = async () => {
+      const res = await getCompetitions()
+      if (res) {
+        setCompetitionBlocks(
+          res.map((block) => (
+            <CompetitionBlock
+              key={block.id}
+              id={block.id}
+              place_id={block.place_id}
+              name={block.name}
+            />
+          ))
+        )
+      }
+    }
+
+    fetchClubData()
+    fetchCompetitionData()
+  }, [])
 
   return (
     <MainLayout>
@@ -43,7 +62,14 @@ const Page = () => {
         <FeedBlock
           title="Các câu lạc bộ nổi bật"
           more="/clubs"
-          blocks={[clubBlocks()]}
+          blocks={[clubBlocks]}
+        />
+      </div>
+      <div className="mt-4 flex w-full flex-col items-center">
+        <FeedBlock
+          title="Các giải đấu hiện tại"
+          more="/competitions"
+          blocks={[competitionBlocks]}
         />
       </div>
     </MainLayout>
