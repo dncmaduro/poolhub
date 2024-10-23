@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from './use-toast'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
