@@ -7,11 +7,14 @@ export interface ClubBlockProps {
   name: string
   address: string
   email: string
+  className?: string
 }
 
 export const ClubBlock = (props: ClubBlockProps) => {
   return (
-    <div className="flex h-[180px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300">
+    <div
+      className={`flex h-[180px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300 ${props.className}`}
+    >
       <div className="flex flex-col">
         <span className="text-lg font-bold">{props.name}</span>
         <span className="mt-3 flex items-center gap-2 text-lg">

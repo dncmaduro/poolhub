@@ -38,5 +38,22 @@ export const useClub = () => {
     }
   }
 
-  return { getClubs, getClub }
+  const searchClubs = async (name?: string, address?: string) => {
+    const { data, error } = await supabase
+      .from('place')
+      .select('*')
+      .ilike('name', `%${name || ''}%`)
+      .ilike('address', `%${address || ''}%`)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin câu lạc bộ',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getClubs, getClub, searchClubs }
 }

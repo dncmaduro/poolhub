@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex h-screen w-screen overflow-y-auto">
       <div className="mx-auto my-auto flex grow flex-col items-center gap-4">
         <h1 className="text-2xl font-bold">
           Chào mừng tới <ThemeText text="PoolHub" />
