@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { useToast } from './use-toast'
+import { useClub } from './use-club'
+import { useProfile } from './use-profile'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -8,6 +10,8 @@ const supabase = createClient(
 
 export const useMatch = () => {
   const { toast } = useToast()
+  const { searchClubs } = useClub()
+  const { searchProfiles } = useProfile()
 
   const getMatches = async () => {
     const { data, error } = await supabase.from('match').select('*').range(0, 2)
@@ -22,5 +26,28 @@ export const useMatch = () => {
     }
   }
 
-  return { getMatches }
+  const searchMatches = async (name?: string, clubs?: string) => {
+    const foundClubs = await searchClubs(clubs || '')
+    const clubIds = foundClubs?.map((club) => club.id)
+
+    const foundProfiles = await searchProfiles(name || '')
+    const profileIds = foundProfiles?.map((profile) => profile.id)
+
+    const { data, error } = await supabase
+      .from('match')
+      .select('*')
+      .in('place_id', clubIds || [])
+      .or(`player1_id.in.(${profileIds}),player2_id.in.(${profileIds})`)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin về trận đấu',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getMatches, searchMatches }
 }

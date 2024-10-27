@@ -15,6 +15,7 @@ export interface MatchBlockProps {
   point1: number
   point2: number
   place_id: number
+  className?: string
 }
 
 export const MatchBlock = (props: MatchBlockProps) => {
@@ -53,7 +54,9 @@ export const MatchBlock = (props: MatchBlockProps) => {
   }, [])
 
   return (
-    <div className="flex h-[180px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300">
+    <div
+      className={`flex h-[180px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300 ${props.className}`}
+    >
       <div className="flex flex-col gap-2">
         <div className="flex justify-between text-lg">
           <span>{player1Name}</span>

@@ -42,5 +42,21 @@ export const useProfile = () => {
     }
   }
 
-  return { createProfile, getProfile, getProfileById }
+  const searchProfiles = async (name?: string) => {
+    const { data, error } = await supabase
+      .from('profile')
+      .select('*')
+      .ilike('name', `%${name || ''}%`)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin hồ sơ',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { createProfile, getProfile, getProfileById, searchProfiles }
 }
