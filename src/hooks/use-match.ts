@@ -49,5 +49,21 @@ export const useMatch = () => {
     }
   }
 
-  return { getMatches, searchMatches }
+  const getMatchesForClub = async (id: number) => {
+    const { data, error } = await supabase
+      .from('match')
+      .select('*')
+      .eq('place_id', id)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin về trận đấu',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getMatches, searchMatches, getMatchesForClub }
 }

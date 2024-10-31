@@ -47,5 +47,21 @@ export const useCompetition = () => {
     }
   }
 
-  return { getCompetitions, searchCompetitions }
+  const getCompetitionsForClub = async (id: number) => {
+    const { data, error } = await supabase
+      .from('competition')
+      .select('*')
+      .eq('place_id', id)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin về giải đấu',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getCompetitions, searchCompetitions, getCompetitionsForClub }
 }

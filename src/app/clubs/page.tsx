@@ -25,7 +25,6 @@ const Page = () => {
 
   const fetchClubs = async (name?: string, address?: string) => {
     const res = await searchClubs(name, address)
-    console.log(res)
     if (res) {
       setClubBlocks(
         res.map((block) => (

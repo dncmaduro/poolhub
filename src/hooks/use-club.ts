@@ -39,7 +39,6 @@ export const useClub = () => {
   }
 
   const searchClubs = async (name?: string, address?: string) => {
-    console.log(name)
     const { data, error } = await supabase
       .from('place')
       .select('*')
