@@ -8,6 +8,7 @@ export interface CompetitionBlockProps {
   id: number
   name: string
   place_id: number
+  className?: string
 }
 
 export const CompetitionBlock = (props: CompetitionBlockProps) => {
@@ -27,7 +28,9 @@ export const CompetitionBlock = (props: CompetitionBlockProps) => {
   }, [])
 
   return (
-    <div className="flex h-[160px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300">
+    <div
+      className={`flex h-[160px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300 ${props.className}`}
+    >
       <div className="flex flex-col">
         <span className="text-lg font-bold">{props.name}</span>
         <span className="mt-4 flex items-center gap-2 text-lg">

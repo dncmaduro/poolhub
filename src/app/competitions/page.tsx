@@ -1,7 +1,7 @@
 'use client'
 
-import { ClubBlock } from '@/components/home/club-block'
-import { Button } from '@/components/ui/button'
+import { CompetitionBlock } from '@/components/home/competition-block'
+import { useCompetition } from '@/hooks/use-competition'
 import {
   Form,
   FormControl,
@@ -9,8 +9,8 @@ import {
   FormItem,
   FormLabel
 } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useClub } from '@/hooks/use-club'
 import MainLayout from '@/layouts/main'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ReactNode, useEffect, useState } from 'react'
@@ -18,23 +18,21 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const Page = () => {
-  const [clubBlocks, setClubBlocks] = useState<ReactNode[]>([])
+  const [competitionBlocks, setCompetitionBlocks] = useState<ReactNode[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const { searchClubs } = useClub()
+  const { searchCompetitions } = useCompetition()
 
-  const fetchClubs = async (name?: string, address?: string) => {
-    const res = await searchClubs(name, address)
-    console.log(res)
+  const fetchCompetitions = async (name?: string, clubs?: string) => {
+    const res = await searchCompetitions(name, clubs)
     if (res) {
-      setClubBlocks(
+      setCompetitionBlocks(
         res.map((block) => (
-          <ClubBlock
+          <CompetitionBlock
             key={block.id}
             id={block.id}
             name={block.name}
-            address={block.address}
-            email={block.email}
+            place_id={block.place_id}
             className="mx-auto"
           />
         ))
@@ -43,32 +41,32 @@ const Page = () => {
   }
 
   useEffect(() => {
-    fetchClubs()
+    fetchCompetitions()
   }, [])
 
   const schema = z.object({
     name: z.string().optional(),
-    address: z.string().optional()
+    clubs: z.string().optional()
   })
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
-      address: ''
+      clubs: ''
     }
   })
 
   const submit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true)
-    await fetchClubs(values.name, values.address)
+    await fetchCompetitions(values.name, values.clubs)
     setIsLoading(false)
   }
 
   return (
     <MainLayout>
       <h1 className="mt-8 text-center text-2xl font-bold text-violet-400">
-        Các câu lạc bộ billiards
+        Các giải đấu billiards
       </h1>
       <Form {...form}>
         <form
@@ -81,18 +79,18 @@ const Page = () => {
               <FormItem>
                 <FormLabel>Tên câu lạc bộ</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nhập tên muốn tìm" {...field} />
+                  <Input placeholder="Nhập tên giải đấu muốn tìm" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
-            name="address"
+            name="clubs"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tên câu lạc bộ</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nhập địa chỉ quán" {...field} />
+                  <Input placeholder="Nhập tên quán thi đấu" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -105,7 +103,7 @@ const Page = () => {
       <div
         className={`mx-auto mt-8 grid w-[1280px] max-w-full grid-cols-3 gap-y-2 ${isLoading && 'pointer-events-none cursor-not-allowed opacity-50'}`}
       >
-        {clubBlocks}
+        {competitionBlocks}
       </div>
     </MainLayout>
   )
