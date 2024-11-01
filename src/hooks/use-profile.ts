@@ -58,5 +58,36 @@ export const useProfile = () => {
     }
   }
 
-  return { createProfile, getProfile, getProfileById, searchProfiles }
+  const updateProfile = async (
+    email: string,
+    name: string,
+    phone?: string,
+    birthyear?: number
+  ) => {
+    const { data, error } = await supabase
+      .from('profile')
+      .update({ name, phone, birthyear })
+      .eq('email', email)
+      .select()
+    if (data) {
+      toast({
+        title: 'Cập nhật hồ sơ thành công'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Không thể cập nhật được hồ sơ',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return {
+    createProfile,
+    getProfile,
+    getProfileById,
+    searchProfiles,
+    updateProfile
+  }
 }
