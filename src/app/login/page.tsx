@@ -18,11 +18,13 @@ import { useAuth } from '@/hooks/use-auth'
 import { useState } from 'react'
 import { Loader2, Eye, EyeClosed } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const Page = () => {
   const { login } = useAuth()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isShowPw, setIsShowPw] = useState<boolean>(false)
+  const router = useRouter()
 
   const schema = z.object({
     email: z.string().email('Sai định dạng email'),
@@ -39,7 +41,10 @@ const Page = () => {
 
   const submit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true)
-    await login(values.email, values.password)
+    const res = await login(values.email, values.password)
+    if (res) {
+      router.push('/home')
+    }
     setIsLoading(false)
   }
 
