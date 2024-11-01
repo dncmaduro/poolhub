@@ -3,7 +3,7 @@
 import Logo from '@/components/ui/logo'
 import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import {
   NavigationMenu,
@@ -18,6 +18,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { clearProfile } from '@/store/profileSlice'
+import { useRouter } from 'next/navigation'
 
 const Header = () => {
   const name = useSelector((state: RootState) => state.profile.name)
@@ -46,6 +48,14 @@ const Header = () => {
       role: 'admin'
     }
   ]
+
+  const dispatch = useDispatch()
+  const router = useRouter()
+
+  const logout = () => {
+    dispatch(clearProfile())
+    router.push('/login')
+  }
 
   return (
     <div className="sticky top-0 flex h-14 w-full items-center justify-between rounded-b-2xl border border-gray-300 bg-white px-4 shadow-sm">
@@ -87,6 +97,7 @@ const Header = () => {
               variant="ghost"
               size="sm"
               className="w-full text-red-500 hover:text-red-500"
+              onClick={() => logout()}
             >
               Đăng xuất
             </Button>

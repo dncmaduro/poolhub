@@ -199,7 +199,7 @@ const Page = () => {
                   </FormItem>
                 )}
               />
-              {isEditing ? (
+              {isEditing && email === profile?.email ? (
                 <div className="flex gap-8">
                   <Button className="w-[200px]" disabled={isLoading}>
                     Cập nhật
