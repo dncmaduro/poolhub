@@ -10,3 +10,13 @@ export type Competition = {
   name: string
   place_id: number
 }
+
+export type Profile = {
+  id: number
+  email: string
+  name: string
+  point: number
+  role: string
+  phone: string | null
+  birthyear: number | null
+}

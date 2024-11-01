@@ -1,6 +1,6 @@
 'use client'
 
-import { Club } from '@/app/types'
+import { Club } from '@/types'
 import { CompetitionBlock } from '@/components/home/competition-block'
 import { MatchBlock } from '@/components/home/match-block'
 import { Button } from '@/components/ui/button'
