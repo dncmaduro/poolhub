@@ -20,3 +20,14 @@ export type Profile = {
   phone: string | null
   birthyear: number | null
 }
+
+export type Match = {
+  id: number
+  status: string
+  player1_id: number
+  player2_id: number
+  date: number
+  point1: number
+  point2: number
+  place_id: number
+}
