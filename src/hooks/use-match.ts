@@ -33,10 +33,26 @@ export const useMatch = () => {
     const foundProfiles = await searchProfiles(name || '')
     const profileIds = foundProfiles?.map((profile) => profile.id)
 
+    if (clubs) {
+      const { data, error } = await supabase
+        .from('match')
+        .select('*')
+        .in('place_id', clubIds || [])
+        .or(`player1_id.in.(${profileIds}),player2_id.in.(${profileIds})`)
+      if (data) {
+        return data
+      } else {
+        toast({
+          title: 'Không lấy được thông tin về trận đấu',
+          description: error.message,
+          variant: 'destructive'
+        })
+      }
+    }
+
     const { data, error } = await supabase
       .from('match')
       .select('*')
-      .in('place_id', clubIds || [])
       .or(`player1_id.in.(${profileIds}),player2_id.in.(${profileIds})`)
     if (data) {
       return data
@@ -81,5 +97,24 @@ export const useMatch = () => {
     }
   }
 
-  return { getMatches, searchMatches, getMatchesForClub, getMatch }
+  const createMatch = async (player1_id: number, player2_id: number) => {
+    const { data, error } = await supabase
+      .from('match')
+      .insert({ player1_id, player2_id })
+      .select()
+    if (data) {
+      toast({
+        title: 'Tạo trận đấu thành công'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Tạo trận đấu không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getMatches, searchMatches, getMatchesForClub, getMatch, createMatch }
 }

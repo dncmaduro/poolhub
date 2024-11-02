@@ -18,7 +18,7 @@ export const CompetitionBlock = (props: CompetitionBlockProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getClub(props.id)
+      const res = await getClub(props.id, true)
       if (res) {
         setClubName(res.name)
       }

@@ -22,7 +22,7 @@ export const useClub = () => {
     }
   }
 
-  const getClub = async (id: number) => {
+  const getClub = async (id: number, toasting?: boolean) => {
     const { data, error } = await supabase
       .from('place')
       .select('*')
@@ -30,11 +30,13 @@ export const useClub = () => {
     if (data) {
       return data[0]
     } else {
-      toast({
-        title: 'Không lấy được thông tin câu lạc bộ',
-        description: error.message,
-        variant: 'destructive'
-      })
+      if (toasting) {
+        toast({
+          title: 'Không lấy được thông tin câu lạc bộ',
+          description: error.message,
+          variant: 'destructive'
+        })
+      }
     }
   }
 

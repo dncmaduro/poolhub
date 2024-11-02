@@ -23,7 +23,7 @@ const Page = () => {
 
   useEffect(() => {
     const fetchClub = async () => {
-      const res = await getClub(Number(params.id))
+      const res = await getClub(Number(params.id), true)
       if (res) {
         setClub(res)
       }

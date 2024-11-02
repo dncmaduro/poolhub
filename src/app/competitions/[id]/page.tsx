@@ -24,7 +24,7 @@ const Page = () => {
       const res = await getCompetition(Number(params.id))
       if (res) {
         setCompetition(res)
-        const res2 = await getClub(res.id)
+        const res2 = await getClub(res.id, true)
         if (res2) {
           setClub(res2)
         }

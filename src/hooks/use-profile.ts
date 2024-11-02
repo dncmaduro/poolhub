@@ -42,11 +42,19 @@ export const useProfile = () => {
     }
   }
 
-  const searchProfiles = async (name?: string) => {
+  const searchProfiles = async (
+    name?: string,
+    minPoint?: number,
+    ascendingPoint?: boolean,
+    user?: boolean
+  ) => {
     const { data, error } = await supabase
       .from('profile')
       .select('*')
       .ilike('name', `%${name || ''}%`)
+      .gte('point', minPoint || 0)
+      .order('point', { ascending: ascendingPoint })
+      .ilike('role', `%${user ? 'user' : ''}%`)
     if (data) {
       return data
     } else {
