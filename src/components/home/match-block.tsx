@@ -42,9 +42,11 @@ export const MatchBlock = (props: MatchBlockProps) => {
     }
 
     const fetchClubData = async () => {
-      const res = await getClub(props.place_id)
-      if (res) {
-        setClubName(res.name)
+      if (props.place_id) {
+        const res = await getClub(props.place_id)
+        if (res) {
+          setClubName(res.name)
+        }
       }
     }
 
@@ -70,7 +72,7 @@ export const MatchBlock = (props: MatchBlockProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin color="#777777" />
-          <span>{clubName}</span>
+          <span>{clubName || 'Chưa có địa điểm'}</span>
         </div>
         <Button variant="outline">Xem thêm</Button>
       </div>

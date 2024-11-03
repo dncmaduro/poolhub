@@ -16,15 +16,30 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
 
 const Page = () => {
   const [matchBlocks, setMatchBlocks] = useState<ReactNode[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [totalPages, setTotalPages] = useState<number>(0)
+  const itemsPerPage = 6
+  const [page, setPage] = useState<number>(1)
 
-  const { searchMatches } = useMatch()
+  const { searchMatches, countMatches } = useMatch()
 
-  const fetchMatches = async (name?: string, clubs?: string) => {
-    const res = await searchMatches(name, clubs)
+  const fetchMatches = async (
+    exactPage?: number,
+    name?: string,
+    clubs?: string
+  ) => {
+    const res = await searchMatches(name, clubs, exactPage || page)
     if (res) {
       setMatchBlocks(
         res.map((match) => (
@@ -46,6 +61,16 @@ const Page = () => {
   }
 
   useEffect(() => {
+    const fetchCountMatches = async () => {
+      const res = await countMatches()
+      if (res) {
+        setTotalPages(
+          Math.trunc(res / itemsPerPage) + (res % itemsPerPage ? 1 : 0)
+        )
+      }
+    }
+
+    fetchCountMatches()
     fetchMatches()
   }, [])
 
@@ -64,7 +89,22 @@ const Page = () => {
 
   const submit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true)
-    await fetchMatches(values.name, values.clubs)
+    await fetchMatches(page, values.name, values.clubs)
+    setIsLoading(false)
+  }
+
+  const goToPage = async (newPage: number) => {
+    setIsLoading(true)
+    const exactPage =
+      newPage > totalPages ? totalPages : newPage < 1 ? 1 : newPage
+    if (exactPage !== page) {
+      setPage(exactPage)
+      await fetchMatches(
+        exactPage,
+        form.getValues().name,
+        form.getValues().clubs
+      )
+    }
     setIsLoading(false)
   }
 
@@ -110,6 +150,38 @@ const Page = () => {
       >
         {matchBlocks}
       </div>
+      <Pagination className="mx-auto mt-10 gap-10">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              className={`${page === 1 && 'cursor-default opacity-50 hover:bg-transparent'}`}
+              onClick={() => goToPage(page - 1)}
+            />
+          </PaginationItem>
+          {totalPages &&
+            Array.from(
+              {
+                length: totalPages
+              },
+              (_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    isActive={page === index + 1}
+                    onClick={() => goToPage(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              )
+            )}
+          <PaginationItem>
+            <PaginationNext
+              className={`${page === totalPages && 'cursor-default opacity-50 hover:bg-transparent'}`}
+              onClick={() => goToPage(page + 1)}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </MainLayout>
   )
 }

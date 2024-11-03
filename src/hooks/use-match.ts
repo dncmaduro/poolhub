@@ -26,12 +26,19 @@ export const useMatch = () => {
     }
   }
 
-  const searchMatches = async (name?: string, clubs?: string) => {
+  const searchMatches = async (
+    name?: string,
+    clubs?: string,
+    page?: number
+  ) => {
     const foundClubs = await searchClubs(clubs || '')
     const clubIds = foundClubs?.map((club) => club.id)
 
     const foundProfiles = await searchProfiles(name || '')
     const profileIds = foundProfiles?.map((profile) => profile.id)
+
+    const itemsPerPage = 6
+    const realPage = page || 1
 
     if (clubs) {
       const { data, error } = await supabase
@@ -39,6 +46,7 @@ export const useMatch = () => {
         .select('*')
         .in('place_id', clubIds || [])
         .or(`player1_id.in.(${profileIds}),player2_id.in.(${profileIds})`)
+        .range(0, 10)
       if (data) {
         return data
       } else {
@@ -54,6 +62,7 @@ export const useMatch = () => {
       .from('match')
       .select('*')
       .or(`player1_id.in.(${profileIds}),player2_id.in.(${profileIds})`)
+      .range((realPage - 1) * itemsPerPage, realPage * itemsPerPage - 1)
     if (data) {
       return data
     } else {
@@ -116,5 +125,19 @@ export const useMatch = () => {
     }
   }
 
-  return { getMatches, searchMatches, getMatchesForClub, getMatch, createMatch }
+  const countMatches = async () => {
+    const { data } = await supabase.from('match').select('*')
+    if (data) {
+      return data.length
+    }
+  }
+
+  return {
+    getMatches,
+    searchMatches,
+    getMatchesForClub,
+    getMatch,
+    createMatch,
+    countMatches
+  }
 }
