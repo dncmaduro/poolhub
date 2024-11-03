@@ -24,6 +24,8 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination'
+import Link from 'next/link'
+import { Plus, Search } from 'lucide-react'
 
 const Page = () => {
   const [matchBlocks, setMatchBlocks] = useState<ReactNode[]>([])
@@ -141,8 +143,14 @@ const Page = () => {
             )}
           />
           <Button type="submit" disabled={isLoading}>
+            <Search />
             Tìm kiếm
           </Button>
+          <Link href="/matches/new">
+            <Button type="button" variant="secondary">
+              <Plus /> Tạo trận mới
+            </Button>
+          </Link>
         </form>
       </Form>
       <div

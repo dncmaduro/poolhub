@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -8,11 +9,14 @@ import {
   FormLabel
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useMatch } from '@/hooks/use-match'
 import { useProfile } from '@/hooks/use-profile'
 import MainLayout from '@/layouts/main'
 import { RootState } from '@/store'
 import { Profile } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -20,7 +24,11 @@ import { z } from 'zod'
 
 const Page = () => {
   const [profile, setProfile] = useState<Profile>()
-  const { getProfile } = useProfile()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { getProfile, getProfileById } = useProfile()
+  const params = useParams()
+  const router = useRouter()
+  const { createMatch } = useMatch()
   const email = useSelector((state: RootState) => state.profile.email)
 
   const schema = z.object({
@@ -45,7 +53,7 @@ const Page = () => {
   })
 
   const fetchProfile = async () => {
-    const res = await getProfile(email)
+    const res = await getProfileById(Number(params.id))
     if (res) {
       setProfile(res)
       form.reset({
@@ -62,6 +70,18 @@ const Page = () => {
   useEffect(() => {
     fetchProfile()
   }, [])
+
+  const newMatch = async () => {
+    setIsLoading(true)
+    const res = await getProfile(email)
+    if (res) {
+      const resMatch = await createMatch(res.id, Number(params.id))
+      if (resMatch) {
+        router.push('/matches')
+      }
+    }
+    setIsLoading(false)
+  }
 
   return (
     <MainLayout>
@@ -136,6 +156,14 @@ const Page = () => {
               )}
             />
           </Form>
+          <Button
+            className="w-fit"
+            onClick={() => newMatch()}
+            disabled={isLoading}
+          >
+            <Plus />
+            Tạo trận mới với người chơi này{' '}
+          </Button>
         </div>
       </div>
     </MainLayout>
