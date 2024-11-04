@@ -46,8 +46,12 @@ export const useProfile = () => {
     name?: string,
     minPoint?: number,
     ascendingPoint?: boolean,
-    user?: boolean
+    user?: boolean,
+    page?: number
   ) => {
+    const itemsPerPage = 10
+    const exactPage = page || 1
+
     const { data, error } = await supabase
       .from('profile')
       .select('*')
@@ -55,6 +59,7 @@ export const useProfile = () => {
       .gte('point', minPoint || 0)
       .order('point', { ascending: ascendingPoint })
       .ilike('role', `%${user ? 'user' : ''}%`)
+      .range((exactPage - 1) * itemsPerPage, exactPage * itemsPerPage - 1)
     if (data) {
       return data
     } else {
@@ -91,11 +96,28 @@ export const useProfile = () => {
     }
   }
 
+  const countProfiles = async (
+    name?: string,
+    minPoint?: number,
+    user?: boolean
+  ) => {
+    const { data } = await supabase
+      .from('profile')
+      .select('*')
+      .ilike('name', `%${name || ''}%`)
+      .gte('point', minPoint || 0)
+      .ilike('role', `%${user ? 'user' : ''}%`)
+    if (data) {
+      return data.length
+    }
+  }
+
   return {
     createProfile,
     getProfile,
     getProfileById,
     searchProfiles,
-    updateProfile
+    updateProfile,
+    countProfiles
   }
 }
