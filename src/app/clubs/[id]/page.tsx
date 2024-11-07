@@ -32,7 +32,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover } from '@/components/ui/popover'
 import { PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
 import { format } from 'date-fns'
-import { usePreorder } from '@/hooks/user-preorder'
+import { usePreorder } from '@/hooks/use-preorder'
 
 const Page = () => {
   const params = useParams()
