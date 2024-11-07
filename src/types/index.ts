@@ -31,3 +31,11 @@ export type Match = {
   point2: number
   place_id: number
 }
+
+export type Preorder = {
+  id: number
+  status: string
+  place_id: number
+  profile_id: number
+  time: Date
+}

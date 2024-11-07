@@ -1,9 +1,9 @@
 'use client'
 
-import MainLayout from '@/layouts/main'
+import { HostLayout } from '@/layouts/host'
 
 const Page = () => {
-  return <MainLayout>Host</MainLayout>
+  return <HostLayout>Yo</HostLayout>
 }
 
 export default Page

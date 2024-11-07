@@ -38,11 +38,6 @@ const Header = () => {
       href: '/clubs'
     },
     {
-      label: 'Quản lý câu lạc bộ',
-      href: '/ownclub',
-      role: 'host'
-    },
-    {
       label: 'Quản lý tài khoản',
       href: '/accounts',
       role: 'admin'
@@ -84,6 +79,7 @@ const Header = () => {
           <DropdownMenuTrigger asChild>
             <Button size="sm" variant="outline">
               {name}
+              <span className="text-gray-400">({role})</span>
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
@@ -91,6 +87,11 @@ const Header = () => {
             <Link href="/profile">
               <Button variant="ghost" size="sm" className="w-full">
                 Hồ sơ
+              </Button>
+            </Link>
+            <Link href="/host">
+              <Button variant="ghost" size="sm" className="w-full">
+                Trang quản lý
               </Button>
             </Link>
             <Button

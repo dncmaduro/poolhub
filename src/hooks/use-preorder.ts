@@ -28,5 +28,21 @@ export const usePreorder = () => {
     }
   }
 
-  return { createPreorder }
+  const getPreordersForClub = async (place_id: number) => {
+    const { data, error } = await supabase
+      .from('preorder')
+      .select('*')
+      .eq('place_id', place_id)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Đặt lịch không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { createPreorder, getPreordersForClub }
 }

@@ -57,5 +57,21 @@ export const useClub = () => {
     }
   }
 
-  return { getClubs, getClub, searchClubs }
+  const getHostClubs = async (email: string) => {
+    const { data, error } = await supabase
+      .from('place')
+      .select('*')
+      .eq('host_email', email)
+    if (data) {
+      return data
+    } else {
+      toast({
+        title: 'Không lấy được thông tin câu lạc bộ',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getClubs, getClub, searchClubs, getHostClubs }
 }
