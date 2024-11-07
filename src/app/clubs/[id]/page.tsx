@@ -8,9 +8,31 @@ import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
 import MainLayout from '@/layouts/main'
-import { Mail, MapPin } from 'lucide-react'
+import { Calendar1, Mail, MapPin } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogOverlay
+} from '@radix-ui/react-dialog'
+import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Form,
+  FormItem,
+  FormLabel,
+  FormField,
+  FormControl
+} from '@/components/ui/form'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover } from '@/components/ui/popover'
+import { PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
+import { format } from 'date-fns'
+import { usePreorder } from '@/hooks/user-preorder'
 
 const Page = () => {
   const params = useParams()
@@ -20,6 +42,8 @@ const Page = () => {
   const { getClub } = useClub()
   const { getCompetitionsForClub } = useCompetition()
   const { getMatchesForClub } = useMatch()
+  const { createPreorder } = usePreorder()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -73,6 +97,23 @@ const Page = () => {
     fetchMatches()
   }, [])
 
+  const schema = z.object({
+    time: z.date()
+  })
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      time: new Date()
+    }
+  })
+
+  const submit = async (values: z.infer<typeof schema>) => {
+    setIsLoading(true)
+    await createPreorder(club?.id || 0, values.time)
+    setIsLoading(false)
+  }
+
   return (
     <MainLayout>
       <div className="mx-auto mt-10 flex w-[1280px] max-w-full gap-8">
@@ -88,7 +129,60 @@ const Page = () => {
                 <Mail />
                 <span>{club.host_email}</span>
               </div>
-              <Button className="mt-10">Đặt chỗ trước</Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="mt-10">Đặt chỗ trước</Button>
+                </DialogTrigger>
+                <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
+                <DialogContent className="fixed left-1/2 top-1/2 w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg">
+                  <DialogTitle>Đặt chỗ</DialogTitle>
+                  <DialogHeader className="mt-4">
+                    Câu lạc bộ: {club.name} - {club.address}
+                  </DialogHeader>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(submit)}
+                      className="mt-10"
+                    >
+                      <FormField
+                        name="time"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-6">
+                            <FormLabel>Thời gian</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button variant="ghost">
+                                    <Calendar1 />
+                                    {format(field.value, 'dd/MM/yyyy')}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="rounded-lg border border-gray-300 bg-white shadow">
+                                  <Calendar
+                                    mode="single"
+                                    {...field}
+                                    initialFocus
+                                    onSelect={(value) =>
+                                      form.setValue('time', value || new Date())
+                                    }
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        disabled={isLoading}
+                        className="mt-4"
+                      >
+                        Submit
+                      </Button>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </>
           )}
         </div>
