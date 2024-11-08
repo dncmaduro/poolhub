@@ -77,10 +77,8 @@ export const PreordersTable = (props: PreordersTableProps) => {
         preorders.map((preorder) => {
           if (preorder.id === id) {
             return {
-              id,
-              profile: preorder.profile,
-              status,
-              time: preorder.time
+              ...preorder,
+              status
             }
           }
           return preorder

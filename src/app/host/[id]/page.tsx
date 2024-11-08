@@ -1,5 +1,6 @@
 'use client'
 
+import { MatchesTable } from '@/components/host/matches-table'
 import { PreordersTable } from '@/components/host/preorders-table'
 import {
   Select,
@@ -11,9 +12,10 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
+import { useMatch } from '@/hooks/use-match'
 import { usePreorder } from '@/hooks/use-preorder'
 import MainLayout from '@/layouts/main'
-import { Club, Preorder } from '@/types'
+import { Club, Match, Preorder } from '@/types'
 import { SelectItem } from '@radix-ui/react-select'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Mail, MapPin } from 'lucide-react'
@@ -23,13 +25,13 @@ import { ReactNode, useEffect, useState } from 'react'
 const Page = () => {
   const params = useParams()
   const [preorders, setPreorders] = useState<Preorder[]>()
-  const [competitions, setCompetitions] = useState<ReactNode[]>()
-  const [matchBlocks, setMatchBlocks] = useState<ReactNode[]>()
-  const [status, setStatus] = useState<string | null>(null)
+  const [matches, setMatches] = useState<Match[]>()
+  const [preorderStatus, setPreorderStatus] = useState<string | null>(null)
+  const [matchStatus, setMatchStatus] = useState<string | null>(null)
   const [club, setClub] = useState<Club>()
   const { getPreordersForClub } = usePreorder()
   const { getClub } = useClub()
-  const { getCompetitionsForClub } = useCompetition()
+  const { getMatchesForClub } = useMatch()
 
   const fetchPreorders = async (status?: string) => {
     const res = await getPreordersForClub(Number(params.id), status)
@@ -45,10 +47,12 @@ const Page = () => {
     }
   }
 
-  const fetchCompetitions = async () => {
-    const res = await getCompetitionsForClub(Number(params.id))
+  const fetchCompetitions = async () => {}
+
+  const fetchMatches = async (status?: string) => {
+    const res = await getMatchesForClub(Number(params.id), status)
     if (res) {
-      setCompetitions(res)
+      setMatches(res)
     }
   }
 
@@ -58,15 +62,14 @@ const Page = () => {
   }, [])
 
   useEffect(() => {
-    fetchPreorders(status?.trim())
-    console.log(
-      !status
-        ? 'Trạng thái'
-        : statusOptions.find((e) => e.value === status)?.label
-    )
-  }, [status])
+    fetchPreorders(preorderStatus?.trim())
+  }, [preorderStatus])
 
-  const statusOptions = [
+  useEffect(() => {
+    fetchMatches(matchStatus?.trim())
+  }, [matchStatus])
+
+  const hostStatusOptions = [
     {
       label: 'Tất cả',
       value: ' '
@@ -112,19 +115,20 @@ const Page = () => {
           </TabsList>
           <TabsContent value="preorders">
             <Select
-              value={status || ''}
-              onValueChange={(value) => setStatus(value)}
+              value={preorderStatus || ''}
+              onValueChange={(value) => setPreorderStatus(value)}
             >
               <SelectTrigger className="my-4 w-[180px]">
                 <SelectValue placeholder="Trạng thái">
-                  {!status
+                  {!preorderStatus
                     ? 'Trạng thái'
-                    : statusOptions.find((e) => e.value === status)?.label}
+                    : hostStatusOptions.find((e) => e.value === preorderStatus)
+                        ?.label}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="text-black">
+              <SelectContent>
                 <SelectGroup>
-                  {statusOptions.map((option) => (
+                  {hostStatusOptions.map((option) => (
                     <SelectItem
                       className="h-[48px] cursor-pointer pt-3 text-center hover:bg-gray-100"
                       value={option.value}
@@ -137,6 +141,35 @@ const Page = () => {
               </SelectContent>
             </Select>
             <PreordersTable preorders={preorders || []} />
+          </TabsContent>
+          <TabsContent value="matches">
+            <Select
+              value={matchStatus || ''}
+              onValueChange={(value) => setMatchStatus(value)}
+            >
+              <SelectTrigger className="my-4 w-[180px]">
+                <SelectValue placeholder="Trạng thái">
+                  {!matchStatus
+                    ? 'Trạng thái'
+                    : hostStatusOptions.find((e) => e.value === matchStatus)
+                        ?.label}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {hostStatusOptions.map((option) => (
+                    <SelectItem
+                      className="h-[48px] cursor-pointer pt-3 text-center hover:bg-gray-100"
+                      value={option.value}
+                      key={option.value}
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <MatchesTable matches={matches || []} />
           </TabsContent>
         </Tabs>
       </div>

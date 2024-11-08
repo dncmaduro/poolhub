@@ -74,10 +74,11 @@ export const useMatch = () => {
     }
   }
 
-  const getMatchesForClub = async (id: number) => {
+  const getMatchesForClub = async (id: number, status?: string) => {
     const { data, error } = await supabase
       .from('match')
       .select('*')
+      .ilike('status', `%${status || ''}%`)
       .eq('place_id', id)
     if (data) {
       return data
@@ -132,12 +133,33 @@ export const useMatch = () => {
     }
   }
 
+  const updateMatch = async (id: number, status?: string) => {
+    const { data, error } = await supabase
+      .from('match')
+      .update({ status })
+      .eq('id', id)
+      .select()
+    if (data) {
+      toast({
+        title: 'Cập nhật trạng thái trận đấu thành công'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Cập nhật trạng thái trận đấu không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
   return {
     getMatches,
     searchMatches,
     getMatchesForClub,
     getMatch,
     createMatch,
-    countMatches
+    countMatches,
+    updateMatch
   }
 }

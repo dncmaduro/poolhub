@@ -26,7 +26,7 @@ export type Match = {
   status: string
   player1_id: number
   player2_id: number
-  date: number
+  time: number
   point1: number
   point2: number
   place_id: number
