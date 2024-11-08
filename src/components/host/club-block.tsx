@@ -55,7 +55,7 @@ export const HostClubBlock = (props: ClubBlockProps) => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500">{props.email}</span>
-        <Link href={`/clubs/${props.id}`}>
+        <Link href={`/host/${props.id}`}>
           <Button variant="outline">Xem thêm</Button>
         </Link>
       </div>

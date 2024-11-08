@@ -28,10 +28,11 @@ export const usePreorder = () => {
     }
   }
 
-  const getPreordersForClub = async (place_id: number) => {
+  const getPreordersForClub = async (place_id: number, status?: string) => {
     const { data, error } = await supabase
       .from('preorder')
       .select('*')
+      .ilike('status', `%${status || ''}%`)
       .eq('place_id', place_id)
     if (data) {
       return data
@@ -44,5 +45,22 @@ export const usePreorder = () => {
     }
   }
 
-  return { createPreorder, getPreordersForClub }
+  const updatePreorder = async (id: number, status: string) => {
+    const { data, error } = await supabase
+      .from('preorder')
+      .update({ status })
+      .eq('id', id)
+      .select()
+    if (data) {
+      return data[0]
+    } else {
+      toast({
+        title: 'Cập nhật yêu cầu đặt chỗ không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { createPreorder, getPreordersForClub, updatePreorder }
 }
