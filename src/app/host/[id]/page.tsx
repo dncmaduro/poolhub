@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useClub } from '@/hooks/use-club'
-import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
 import { usePreorder } from '@/hooks/use-preorder'
 import MainLayout from '@/layouts/main'
@@ -20,7 +19,7 @@ import { SelectItem } from '@radix-ui/react-select'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Mail, MapPin } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const Page = () => {
   const params = useParams()
