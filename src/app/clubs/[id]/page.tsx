@@ -64,6 +64,8 @@ const Page = () => {
               name={block.name}
               place_id={block.place_id}
               className="mx-auto mt-8"
+              startTime={block.startTime}
+              endTime={block.endTime}
             />
           ))
         )
