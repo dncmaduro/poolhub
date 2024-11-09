@@ -9,6 +9,9 @@ export type Competition = {
   id: number
   name: string
   place_id: number
+  startTime: Date
+  endTime: Date
+  status: string
 }
 
 export type Profile = {

@@ -3,11 +3,14 @@ import { useEffect, useState } from 'react'
 import { Warehouse } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../ui/button'
+import { format } from 'date-fns'
 
 export interface CompetitionBlockProps {
   id: number
   name: string
   place_id: number
+  startTime: Date
+  endTime: Date
   className?: string
 }
 
@@ -29,10 +32,15 @@ export const CompetitionBlock = (props: CompetitionBlockProps) => {
 
   return (
     <div
-      className={`flex h-[160px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300 ${props.className}`}
+      className={`flex h-[180px] w-[350px] flex-col justify-between rounded-lg border border-gray-200 px-6 py-4 hover:border-violet-300 ${props.className}`}
     >
       <div className="flex flex-col">
         <span className="text-lg font-bold">{props.name}</span>
+        <span className="text-base text-gray-600">
+          {' '}
+          ({format(props.startTime, 'dd/MM/yyyy')} đến{' '}
+          {format(props.endTime, 'dd/MM/yyyy')})
+        </span>
         <span className="mt-4 flex items-center gap-2 text-lg">
           <Warehouse color="#777777" />
           {clubName}

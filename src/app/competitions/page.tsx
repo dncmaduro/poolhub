@@ -33,6 +33,8 @@ const Page = () => {
             id={block.id}
             name={block.name}
             place_id={block.place_id}
+            startTime={block.startTime}
+            endTime={block.endTime}
             className="mx-auto"
           />
         ))

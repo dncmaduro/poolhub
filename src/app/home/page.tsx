@@ -47,6 +47,8 @@ const Page = () => {
               id={block.id}
               place_id={block.place_id}
               name={block.name}
+              startTime={block.startTime}
+              endTime={block.endTime}
             />
           ))
         )

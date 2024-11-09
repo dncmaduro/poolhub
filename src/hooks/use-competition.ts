@@ -47,11 +47,12 @@ export const useCompetition = () => {
     }
   }
 
-  const getCompetitionsForClub = async (id: number) => {
+  const getCompetitionsForClub = async (id: number, status?: string) => {
     const { data, error } = await supabase
       .from('competition')
       .select('*')
       .eq('place_id', id)
+      .ilike('status', `%${status || ''}%`)
     if (data) {
       return data
     } else {
@@ -79,10 +80,31 @@ export const useCompetition = () => {
     }
   }
 
+  const updateCompetition = async (id: number, status: string) => {
+    const { data, error } = await supabase
+      .from('competition')
+      .update({ status })
+      .eq('id', id)
+      .select()
+    if (data) {
+      toast({
+        title: 'Cập nhật trạng thái cho giải đấu thành công'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Cập nhật trạng thái cho giải đấu không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
   return {
     getCompetitions,
     searchCompetitions,
     getCompetitionsForClub,
-    getCompetition
+    getCompetition,
+    updateCompetition
   }
 }

@@ -148,7 +148,7 @@ export const MatchesTable = (props: MatchesTableProps) => {
                       <Button
                         variant="destructive"
                         onClick={() => {
-                          handleActions(match.id, 'delcined')
+                          handleActions(match.id, 'declined')
                         }}
                       >
                         Từ chối

@@ -1,5 +1,6 @@
 'use client'
 
+import { CompetitionsTable } from '@/components/host/competitions-table'
 import { MatchesTable } from '@/components/host/matches-table'
 import { PreordersTable } from '@/components/host/preorders-table'
 import {
@@ -11,10 +12,11 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useClub } from '@/hooks/use-club'
+import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
 import { usePreorder } from '@/hooks/use-preorder'
 import MainLayout from '@/layouts/main'
-import { Club, Match, Preorder } from '@/types'
+import { Club, Competition, Match, Preorder } from '@/types'
 import { SelectItem } from '@radix-ui/react-select'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Mail, MapPin } from 'lucide-react'
@@ -25,12 +27,17 @@ const Page = () => {
   const params = useParams()
   const [preorders, setPreorders] = useState<Preorder[]>()
   const [matches, setMatches] = useState<Match[]>()
+  const [competitions, setCompetitions] = useState<Competition[]>()
   const [preorderStatus, setPreorderStatus] = useState<string | null>(null)
   const [matchStatus, setMatchStatus] = useState<string | null>(null)
+  const [competitionStatus, setCompetitionStatus] = useState<string | null>(
+    null
+  )
   const [club, setClub] = useState<Club>()
   const { getPreordersForClub } = usePreorder()
   const { getClub } = useClub()
   const { getMatchesForClub } = useMatch()
+  const { getCompetitionsForClub } = useCompetition()
 
   const fetchPreorders = async (status?: string) => {
     const res = await getPreordersForClub(Number(params.id), status)
@@ -46,7 +53,12 @@ const Page = () => {
     }
   }
 
-  const fetchCompetitions = async () => {}
+  const fetchCompetitions = async (status?: string) => {
+    const res = await getCompetitionsForClub(Number(params.id), status)
+    if (res) {
+      setCompetitions(res)
+    }
+  }
 
   const fetchMatches = async (status?: string) => {
     const res = await getMatchesForClub(Number(params.id), status)
@@ -68,6 +80,10 @@ const Page = () => {
     fetchMatches(matchStatus?.trim())
   }, [matchStatus])
 
+  useEffect(() => {
+    fetchCompetitions(competitionStatus?.trim())
+  }, [competitionStatus])
+
   const hostStatusOptions = [
     {
       label: 'Tất cả',
@@ -84,6 +100,29 @@ const Page = () => {
     {
       label: 'Đã từ chối',
       value: 'declined'
+    }
+  ]
+
+  const hostCompetitionStatusOptions = [
+    {
+      label: 'Tất cả',
+      value: ' '
+    },
+    {
+      label: 'Đang mở',
+      value: 'open'
+    },
+    {
+      label: 'Đang diễn ra',
+      value: 'in progress'
+    },
+    {
+      label: 'Kết thúc',
+      value: 'completed'
+    },
+    {
+      label: 'Hủy bỏ',
+      value: 'canceled'
     }
   ]
 
@@ -169,6 +208,36 @@ const Page = () => {
               </SelectContent>
             </Select>
             <MatchesTable matches={matches || []} />
+          </TabsContent>
+          <TabsContent value="competitions">
+            <Select
+              value={competitionStatus || ''}
+              onValueChange={(value) => setCompetitionStatus(value)}
+            >
+              <SelectTrigger className="my-4 w-[180px]">
+                <SelectValue placeholder="Trạng thái">
+                  {!competitionStatus
+                    ? 'Trạng thái'
+                    : hostCompetitionStatusOptions.find(
+                        (e) => e.value === competitionStatus
+                      )?.label}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {hostCompetitionStatusOptions.map((option) => (
+                    <SelectItem
+                      className="h-[48px] cursor-pointer pt-3 text-center hover:bg-gray-100"
+                      value={option.value}
+                      key={option.value}
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <CompetitionsTable competitions={competitions || []} />
           </TabsContent>
         </Tabs>
       </div>
