@@ -73,5 +73,28 @@ export const useClub = () => {
     }
   }
 
-  return { getClubs, getClub, searchClubs, getHostClubs }
+  const createClub = async (
+    host_email: string,
+    name: string,
+    address: string
+  ) => {
+    const { data, error } = await supabase
+      .from('place')
+      .insert({ name, host_email, address })
+      .select()
+    if (data) {
+      toast({
+        title: 'Tạo câu lạc bộ thành công!'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Không tạo được câu lạc bộ',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { getClubs, getClub, searchClubs, getHostClubs, createClub }
 }
