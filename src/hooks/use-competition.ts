@@ -100,11 +100,36 @@ export const useCompetition = () => {
     }
   }
 
+  const createCompetition = async (
+    name: string,
+    place_id: number,
+    startTime: Date,
+    endTime: Date
+  ) => {
+    const { data, error } = await supabase
+      .from('competition')
+      .insert({ name, place_id, startTime, endTime, status: 'open' })
+      .select()
+    if (data) {
+      toast({
+        title: 'Tạo giải đấu thành công'
+      })
+      return data[0]
+    } else {
+      toast({
+        title: 'Tạo giải đấu không thành công',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
   return {
     getCompetitions,
     searchCompetitions,
     getCompetitionsForClub,
     getCompetition,
-    updateCompetition
+    updateCompetition,
+    createCompetition
   }
 }

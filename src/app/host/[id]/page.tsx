@@ -3,6 +3,27 @@
 import { CompetitionsTable } from '@/components/host/competitions-table'
 import { MatchesTable } from '@/components/host/matches-table'
 import { PreordersTable } from '@/components/host/preorders-table'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -15,16 +36,24 @@ import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
 import { usePreorder } from '@/hooks/use-preorder'
+import { useToast } from '@/hooks/use-toast'
 import MainLayout from '@/layouts/main'
 import { Club, Competition, Match, Preorder } from '@/types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { DialogOverlay } from '@radix-ui/react-dialog'
 import { SelectItem } from '@radix-ui/react-select'
 import { TabsContent } from '@radix-ui/react-tabs'
-import { Mail, MapPin } from 'lucide-react'
-import { useParams } from 'next/navigation'
+import { format } from 'date-fns'
+import { Calendar1, Mail, MapPin } from 'lucide-react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const Page = () => {
   const params = useParams()
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [preorders, setPreorders] = useState<Preorder[]>()
   const [matches, setMatches] = useState<Match[]>()
   const [competitions, setCompetitions] = useState<Competition[]>()
@@ -37,7 +66,9 @@ const Page = () => {
   const { getPreordersForClub } = usePreorder()
   const { getClub } = useClub()
   const { getMatchesForClub } = useMatch()
-  const { getCompetitionsForClub } = useCompetition()
+  const { getCompetitionsForClub, createCompetition } = useCompetition()
+  const [isDialogLoading, setIsDialogLoading] = useState<boolean>(false)
+  const { toast } = useToast()
 
   const fetchPreorders = async (status?: string) => {
     const res = await getPreordersForClub(Number(params.id), status)
@@ -126,6 +157,55 @@ const Page = () => {
     }
   ]
 
+  const schema = z.object({
+    name: z.string(),
+    startTime: z.date(),
+    endTime: z.date()
+  })
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      startTime: new Date(),
+      endTime: new Date()
+    }
+  })
+
+  const submit = async (values: z.infer<typeof schema>) => {
+    setIsDialogLoading(true)
+    if (values.startTime > values.endTime) {
+      toast({
+        title: 'Ngày kết thúc không được trước ngày bắt đầu',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    await createCompetition(
+      values.name,
+      Number(params.id),
+      values.startTime,
+      values.endTime
+    )
+    setIsDialogLoading(false)
+  }
+
+  const tabs = [
+    {
+      label: 'Đơn đặt trước',
+      value: 'preorders'
+    },
+    {
+      label: 'Các trận đấu',
+      value: 'matches'
+    },
+    {
+      label: 'Các giải đấu',
+      value: 'competitions'
+    }
+  ]
+
   return (
     <MainLayout>
       <div className="mx-auto mt-10 flex w-[1280px] max-w-full flex-col gap-8">
@@ -145,11 +225,22 @@ const Page = () => {
           )}
         </div>
 
-        <Tabs defaultValue="preorders">
+        <Tabs defaultValue={searchParams.get('tab') || 'preorders'}>
           <TabsList className="mb-4">
-            <TabsTrigger value="preorders">Đơn đặt trước</TabsTrigger>
-            <TabsTrigger value="matches">Các trận đấu</TabsTrigger>
-            <TabsTrigger value="competitions">Các giải đấu</TabsTrigger>
+            {tabs.map((tab) => {
+              const newParams = new URLSearchParams(window.location.search)
+              newParams.set('tab', tab.value)
+
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  onClick={() => router.push(`?${newParams.toString()}`)}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              )
+            })}
           </TabsList>
           <TabsContent value="preorders">
             <Select
@@ -238,6 +329,100 @@ const Page = () => {
               </SelectContent>
             </Select>
             <CompetitionsTable competitions={competitions || []} />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Tạo giải đấu mới</Button>
+              </DialogTrigger>
+              <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
+              <DialogContent className="fixed left-1/2 top-1/2 w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg">
+                <DialogTitle>Giải đấu mới</DialogTitle>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(submit)}
+                    className="flex flex-col gap-4"
+                  >
+                    <FormField
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tên giải đấu</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nhập tên giải đấu" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex gap-4">
+                      <FormField
+                        name="startTime"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-6">
+                            <FormLabel>Bắt đầu</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button variant="ghost">
+                                    <Calendar1 />
+                                    {format(field.value, 'dd/MM/yyyy')}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="rounded-lg border border-gray-300 bg-white shadow">
+                                  <Calendar
+                                    mode="single"
+                                    {...field}
+                                    initialFocus
+                                    onSelect={(value) =>
+                                      form.setValue(
+                                        'startTime',
+                                        value || new Date()
+                                      )
+                                    }
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="endTime"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-6">
+                            <FormLabel>Kết thúc</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button variant="ghost">
+                                    <Calendar1 />
+                                    {format(field.value, 'dd/MM/yyyy')}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="rounded-lg border border-gray-300 bg-white shadow">
+                                  <Calendar
+                                    mode="single"
+                                    {...field}
+                                    initialFocus
+                                    onSelect={(value) =>
+                                      form.setValue(
+                                        'endTime',
+                                        value || new Date()
+                                      )
+                                    }
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <Button type="submit" disabled={isDialogLoading}>
+                      Tạo
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
         </Tabs>
       </div>
