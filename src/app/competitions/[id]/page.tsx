@@ -9,6 +9,7 @@ import { MapPin } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 import { Player } from '@/components/competition/player'
+import Link from 'next/link'
 
 const Page = () => {
   const params = useParams()
@@ -69,9 +70,9 @@ const Page = () => {
               <div className="mt-4 flex items-center gap-2 text-lg">
                 <MapPin />
                 {club && (
-                  <span>
+                  <Link href={`/clubs/${club.id}`}>
                     {club.name} - {club.address}
-                  </span>
+                  </Link>
                 )}
               </div>
             </>

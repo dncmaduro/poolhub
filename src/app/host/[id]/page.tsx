@@ -32,6 +32,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { urlToPoolMap } from '@/helpers'
 import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
@@ -45,6 +46,7 @@ import { SelectItem } from '@radix-ui/react-select'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { format } from 'date-fns'
 import { Calendar1, Mail, MapPin } from 'lucide-react'
+import Link from 'next/link'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -213,10 +215,14 @@ const Page = () => {
           {club && (
             <>
               <h1 className="text-3xl font-bold">{club.name}</h1>
-              <div className="mt-4 flex items-center gap-2 text-lg">
+              <Link
+                href={urlToPoolMap({ lat: club.lat, lon: club.lon })}
+                target="_blank"
+                className="mt-4 flex items-center gap-2 text-lg"
+              >
                 <MapPin />
                 <span>{club.address}</span>
-              </div>
+              </Link>
               <div className="mt-4 flex items-center gap-2 text-lg">
                 <Mail />
                 <span>{club.host_email}</span>

@@ -3,6 +3,8 @@ export type Club = {
   name: string
   address: string
   host_email: string
+  lat: number
+  lon: number
 }
 
 export type Competition = {

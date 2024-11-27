@@ -33,6 +33,8 @@ import { Popover } from '@/components/ui/popover'
 import { PopoverContent, PopoverTrigger } from '@radix-ui/react-popover'
 import { format } from 'date-fns'
 import { usePreorder } from '@/hooks/use-preorder'
+import Link from 'next/link'
+import { urlToPoolMap } from '@/helpers'
 
 const Page = () => {
   const params = useParams()
@@ -123,10 +125,14 @@ const Page = () => {
           {club && (
             <>
               <h1 className="text-3xl font-bold">{club.name}</h1>
-              <div className="mt-4 flex items-center gap-2 text-lg">
+              <Link
+                className="mt-4 flex items-center gap-2 text-lg"
+                href={urlToPoolMap({ lat: club.lat, lon: club.lon })}
+                target="_blank"
+              >
                 <MapPin />
                 <span>{club.address}</span>
-              </div>
+              </Link>
               <div className="mt-4 flex items-center gap-2 text-lg">
                 <Mail />
                 <span>{club.host_email}</span>

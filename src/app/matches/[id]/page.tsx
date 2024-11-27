@@ -5,6 +5,7 @@ import { useClub } from '@/hooks/use-club'
 import { useMatch } from '@/hooks/use-match'
 import MainLayout from '@/layouts/main'
 import { Club, Match } from '@/types'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -54,9 +55,9 @@ const Page = () => {
               />
             )}
           </div>
-          <span className="mt-10 text-xl">
+          <Link href={`/clubs/${club?.id}`} className="mt-10 text-xl">
             Địa điểm: {`${club && club.name}, ${club && club.address} `}
-          </span>
+          </Link>
         </div>
       </div>
     </MainLayout>
