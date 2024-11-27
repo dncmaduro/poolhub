@@ -223,6 +223,13 @@ const Page = () => {
                 <MapPin />
                 <span>{club.address}</span>
               </Link>
+              <Link
+                href={urlToPoolMap(address, { lat: club.lat, lon: club.lon })}
+              >
+                <Button size="sm" className="mt-4">
+                  Xem đường đi
+                </Button>
+              </Link>
               <div className="mt-4 flex items-center gap-2 text-lg">
                 <Mail />
                 <span>{club.host_email}</span>

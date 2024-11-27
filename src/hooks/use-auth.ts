@@ -66,7 +66,14 @@ export const useAuth = () => {
       if (res.password === password) {
         const data2 = await getProfile(email)
         if (data2) {
-          dispatch(setProfile({ email, role: data2.role, name: data2.name }))
+          dispatch(
+            setProfile({
+              email,
+              role: data2.role,
+              name: data2.name,
+              address: { lat: data2.lat, lon: data2.lon }
+            })
+          )
           toast({
             title: 'Đăng nhập thành công'
           })

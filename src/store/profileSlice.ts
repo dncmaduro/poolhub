@@ -4,12 +4,20 @@ interface State {
   email: string
   name: string
   role: string
+  address: {
+    lat: number
+    lon: number
+  }
 }
 
 const initialState: State = {
   email: '',
   name: '',
-  role: ''
+  role: '',
+  address: {
+    lat: 0,
+    lon: 0
+  }
 }
 
 const profileSlice = createSlice({
@@ -20,11 +28,16 @@ const profileSlice = createSlice({
       state.email = action.payload.email
       state.name = action.payload.name
       state.role = action.payload.role
+      state.address = action.payload.address
     },
     clearProfile: (state) => {
       state.email = ''
       state.name = ''
       state.role = ''
+      state.address = {
+        lat: 0,
+        lon: 0
+      }
     }
   }
 })

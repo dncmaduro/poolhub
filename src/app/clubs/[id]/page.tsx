@@ -35,6 +35,8 @@ import { format } from 'date-fns'
 import { usePreorder } from '@/hooks/use-preorder'
 import Link from 'next/link'
 import { urlToPoolMap } from '@/helpers'
+import { RootState } from '@/store'
+import { useSelector } from 'react-redux'
 
 const Page = () => {
   const params = useParams()
@@ -46,6 +48,7 @@ const Page = () => {
   const { getMatchesForClub } = useMatch()
   const { createPreorder } = usePreorder()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const address = useSelector((state: RootState) => state.profile.address)
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -118,6 +121,8 @@ const Page = () => {
     setIsLoading(false)
   }
 
+  console.log(address)
+
   return (
     <MainLayout>
       <div className="mx-auto mt-10 flex w-[1280px] max-w-full gap-8">
@@ -132,6 +137,13 @@ const Page = () => {
               >
                 <MapPin />
                 <span>{club.address}</span>
+              </Link>
+              <Link
+                href={urlToPoolMap(address, { lat: club.lat, lon: club.lon })}
+              >
+                <Button size="sm" className="mt-4">
+                  Xem đường đi
+                </Button>
               </Link>
               <div className="mt-4 flex items-center gap-2 text-lg">
                 <Mail />
