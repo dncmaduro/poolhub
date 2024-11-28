@@ -39,6 +39,7 @@ import { useMatch } from '@/hooks/use-match'
 import { usePreorder } from '@/hooks/use-preorder'
 import { useToast } from '@/hooks/use-toast'
 import MainLayout from '@/layouts/main'
+import { RootState } from '@/store'
 import { Club, Competition, Match, Preorder } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogOverlay } from '@radix-ui/react-dialog'
@@ -50,6 +51,7 @@ import Link from 'next/link'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import { z } from 'zod'
 
 const Page = () => {
@@ -71,6 +73,7 @@ const Page = () => {
   const { getCompetitionsForClub, createCompetition } = useCompetition()
   const [isDialogLoading, setIsDialogLoading] = useState<boolean>(false)
   const { toast } = useToast()
+  const address = useSelector((state: RootState) => state.profile.address)
 
   const fetchPreorders = async (status?: string) => {
     const res = await getPreordersForClub(Number(params.id), status)

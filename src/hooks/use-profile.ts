@@ -1,5 +1,7 @@
+import { setAddress } from '@/store/profileSlice'
 import { createClient } from '@supabase/supabase-js'
 import { useToast } from './use-toast'
+import { useDispatch } from 'react-redux'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -8,6 +10,7 @@ const supabase = createClient(
 
 export const useProfile = () => {
   const { toast } = useToast()
+  const dispatch = useDispatch()
 
   const createProfile = async (email: string, name: string) => {
     const { data, error } = await supabase
@@ -112,12 +115,30 @@ export const useProfile = () => {
     }
   }
 
+  const updateAddress = async (email: string, lat: number, lon: number) => {
+    const { data } = await supabase
+      .from('profile')
+      .update({ lat, lon })
+      .eq('email', email)
+      .select()
+    if (data) {
+      dispatch(setAddress({ lat: data[0].lat, lon: data[0].lon }))
+      return data[0]
+    } else {
+      toast({
+        title: 'Cập nhật vị trí không thành công',
+        variant: 'destructive'
+      })
+    }
+  }
+
   return {
     createProfile,
     getProfile,
     getProfileById,
     searchProfiles,
     updateProfile,
-    countProfiles
+    countProfiles,
+    updateAddress
   }
 }

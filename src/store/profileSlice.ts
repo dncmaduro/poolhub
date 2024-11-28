@@ -5,9 +5,14 @@ interface State {
   name: string
   role: string
   address: {
-    lat: number
-    lon: number
+    lat: number | null
+    lon: number | null
   }
+}
+
+interface Address {
+  lat: number | null
+  lon: number | null
 }
 
 const initialState: State = {
@@ -30,17 +35,20 @@ const profileSlice = createSlice({
       state.role = action.payload.role
       state.address = action.payload.address
     },
+    setAddress: (state, action: PayloadAction<Address>) => {
+      state.address = action.payload
+    },
     clearProfile: (state) => {
       state.email = ''
       state.name = ''
       state.role = ''
       state.address = {
-        lat: 0,
-        lon: 0
+        lat: null,
+        lon: null
       }
     }
   }
 })
 
-export const { setProfile, clearProfile } = profileSlice.actions
+export const { setProfile, clearProfile, setAddress } = profileSlice.actions
 export default profileSlice.reducer

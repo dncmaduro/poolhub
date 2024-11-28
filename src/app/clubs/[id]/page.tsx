@@ -121,8 +121,6 @@ const Page = () => {
     setIsLoading(false)
   }
 
-  console.log(address)
-
   return (
     <MainLayout>
       <div className="mx-auto mt-10 flex w-[1280px] max-w-full gap-8">

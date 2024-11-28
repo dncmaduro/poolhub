@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { clearProfile } from '@/store/profileSlice'
 import { useRouter } from 'next/navigation'
+import { AddressModal } from '../header/address'
 
 const Header = () => {
   const name = useSelector((state: RootState) => state.profile.name)
@@ -54,7 +55,10 @@ const Header = () => {
 
   return (
     <div className="sticky top-0 flex h-14 w-full items-center justify-between rounded-b-2xl border border-gray-300 bg-white px-4 shadow-sm">
-      <Logo />
+      <div className="flex items-center gap-4">
+        <Logo />
+        <AddressModal />
+      </div>
       <div className="flex items-center gap-2">
         <NavigationMenu>
           <NavigationMenuList>
