@@ -51,14 +51,18 @@ const Page = () => {
 
   const schema = z.object({
     name: z.string(),
-    address: z.string()
+    address: z.string(),
+    lat: z.coerce.number(),
+    lon: z.coerce.number()
   })
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
-      address: ''
+      address: '',
+      lat: 0,
+      lon: 0
     }
   })
 
@@ -108,6 +112,28 @@ const Page = () => {
                         <FormLabel>Địa chỉ</FormLabel>
                         <FormControl>
                           <Input placeholder="Nhập địa chỉ" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="lat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Địa chỉ</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Vĩ độ" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="lon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Địa chỉ</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Kinh độ" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
