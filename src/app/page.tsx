@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import ThemeText from '@/components/ui/theme-text'
 import Link from 'next/link'
-import Map from '@/components/map'
 
 export default function Home() {
   return (
@@ -26,7 +25,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <Map />
     </div>
   )
 }

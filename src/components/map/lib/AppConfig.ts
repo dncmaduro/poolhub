@@ -5,7 +5,7 @@ export const AppConfig = {
   minZoom: 9,
   maxZoom: 18, // max zoom level of CARTO: 18
   ui: {
-    topBarHeight: 80,
+    topBarHeight: 0,
     bigIconSize: 48,
     mapIconSize: 32,
     markerIconSize: 32,

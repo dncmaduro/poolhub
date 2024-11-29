@@ -43,7 +43,13 @@ const LeafletMapContainer = dynamic(
   }
 )
 
-const LeafletMapInner = () => {
+interface MapInnerProps {
+  height: number
+  width: number
+  usePercent: boolean
+}
+
+const LeafletMapInner = (props: MapInnerProps) => {
   const { map } = useMapContext()
   const {
     width: viewportWidth,
@@ -78,15 +84,12 @@ const LeafletMapInner = () => {
   }, [allMarkersBoundCenter, map])
 
   return (
-    <div className="absolute h-full w-full overflow-hidden" ref={viewportRef}>
+    <div className="absolute w-full h-full overflow-hidden" ref={viewportRef}>
       <div
         className={`absolute left-0 w-full transition-opacity ${isLoading ? 'opacity-0' : 'opacity-1'}`}
         style={{
-          top: AppConfig.ui.topBarHeight,
-          width: viewportWidth ?? '100%',
-          height: viewportHeight
-            ? viewportHeight - AppConfig.ui.topBarHeight
-            : '100%'
+          width: `${props.width}${props.usePercent ? '%' : 'px'}`,
+          height: `${props.height}${props.usePercent ? '%' : 'px'}`
         }}
       >
         {allMarkersBoundCenter && clustersByCategory && (
@@ -117,8 +120,6 @@ const LeafletMapInner = () => {
                 ))}
               </>
             ) : (
-              // we have to spawn at least one element to keep it happy
-              // eslint-disable-next-line react/jsx-no-useless-fragment
               <></>
             )}
           </LeafletMapContainer>
@@ -128,10 +129,15 @@ const LeafletMapInner = () => {
   )
 }
 
-// pass through to get context in <MapInner>
-const Map = () => (
+interface MapProps {
+  width: number
+  height: number
+  usePercent?: boolean
+}
+
+const Map = (props: MapProps) => (
   <LeafleftMapContextProvider>
-    <LeafletMapInner />
+    <LeafletMapInner width={props.width} height={props.height} usePercent={props.usePercent || false}  />
   </LeafleftMapContextProvider>
 )
 
