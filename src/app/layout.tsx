@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import ClientProvider from '@/app/client-provider'
+import 'leaflet/dist/leaflet.css'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
