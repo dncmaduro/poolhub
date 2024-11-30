@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useResizeDetector } from 'react-resize-detector'
 
 import { AppConfig } from './lib/AppConfig'
@@ -11,6 +11,9 @@ import { Places } from './lib/Places'
 import LeafleftMapContextProvider from './LeafletMapContextProvider'
 import useMapContext from './useMapContext'
 import useMarkerData from './useMarkerData'
+import { CoordinateBox } from './ui/coordinate-box'
+import Leaflet from 'leaflet'
+import { ClickedMarker } from './LeafletMarker/clicked-marker'
 
 const LeafletCluster = dynamic(
   async () => (await import('./LeafletCluster')).LeafletCluster(),
@@ -18,24 +21,14 @@ const LeafletCluster = dynamic(
     ssr: false
   }
 )
-const CenterToMarkerButton = dynamic(
-  async () => (await import('./button/CenterButton')).CenterButton,
-  {
-    ssr: false
-  }
-)
+
 const CustomMarker = dynamic(
   async () => (await import('./LeafletMarker')).CustomMarker,
   {
     ssr: false
   }
 )
-const LocateButton = dynamic(
-  async () => (await import('./button/LocateButton')).LocateButton,
-  {
-    ssr: false
-  }
-)
+
 const LeafletMapContainer = dynamic(
   async () => (await import('./LeafletMapContainer')).LeafletMapContainer,
   {
@@ -50,6 +43,7 @@ interface MapInnerProps {
 }
 
 const LeafletMapInner = (props: MapInnerProps) => {
+  const [clickedPosition, setClickedPosition] = useState<Leaflet.LatLng | undefined>()
   const { map } = useMapContext()
   const {
     width: viewportWidth,
@@ -68,6 +62,17 @@ const LeafletMapInner = (props: MapInnerProps) => {
   })
 
   const isLoading = !map || !viewportWidth || !viewportHeight
+
+  useEffect(() => {
+    if (!map) return
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      setClickedPosition(e.latlng)
+    }
+    map.on('click', handleMapClick)
+    return () => {
+      map.off('click', handleMapClick)
+    }
+  }, [map])
 
   /** watch position & zoom of all markers */
   useEffect(() => {
@@ -92,6 +97,7 @@ const LeafletMapInner = (props: MapInnerProps) => {
           height: `${props.height}${props.usePercent ? '%' : 'px'}`
         }}
       >
+        <CoordinateBox location={clickedPosition} />
         {allMarkersBoundCenter && clustersByCategory && (
           <LeafletMapContainer
             center={allMarkersBoundCenter.centerPos}
@@ -101,11 +107,7 @@ const LeafletMapInner = (props: MapInnerProps) => {
           >
             {!isLoading ? (
               <>
-                <CenterToMarkerButton
-                  center={allMarkersBoundCenter.centerPos}
-                  zoom={allMarkersBoundCenter.minZoom}
-                />
-                <LocateButton />
+                <ClickedMarker position={clickedPosition} />
                 {Object.values(clustersByCategory).map((item) => (
                   <LeafletCluster
                     key={item.category}
