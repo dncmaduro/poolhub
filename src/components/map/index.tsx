@@ -64,15 +64,16 @@ const LeafletMapInner = (props: MapInnerProps) => {
   const isLoading = !map || !viewportWidth || !viewportHeight
 
   useEffect(() => {
-    if (!map) return
-    const handleMapClick = (e: L.LeafletMouseEvent) => {
-      setClickedPosition(e.latlng)
+    if (typeof window !== 'undefined' && map) {
+      const handleMapClick = (e: L.LeafletMouseEvent) => {
+        setClickedPosition(e.latlng);
+      };
+      map.on('click', handleMapClick);
+      return () => {
+        map.off('click', handleMapClick);
+      };
     }
-    map.on('click', handleMapClick)
-    return () => {
-      map.off('click', handleMapClick)
-    }
-  }, [map])
+  }, [map]);
 
   /** watch position & zoom of all markers */
   useEffect(() => {
