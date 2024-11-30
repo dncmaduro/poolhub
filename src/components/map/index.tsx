@@ -11,9 +11,9 @@ import { Places } from './lib/Places'
 import LeafleftMapContextProvider from './LeafletMapContextProvider'
 import useMapContext from './useMapContext'
 import useMarkerData from './useMarkerData'
-import { CoordinateBox } from './ui/coordinate-box'
+// import { CoordinateBox } from './ui/coordinate-box'
 import Leaflet from 'leaflet'
-import { ClickedMarker } from './LeafletMarker/clicked-marker'
+// import { ClickedMarker } from './LeafletMarker/clicked-marker'
 
 const LeafletCluster = dynamic(
   async () => (await import('./LeafletCluster')).LeafletCluster(),
@@ -98,7 +98,7 @@ const LeafletMapInner = (props: MapInnerProps) => {
           height: `${props.height}${props.usePercent ? '%' : 'px'}`
         }}
       >
-        <CoordinateBox location={clickedPosition} />
+        {/* <CoordinateBox location={clickedPosition} /> */}
         {allMarkersBoundCenter && clustersByCategory && (
           <LeafletMapContainer
             center={allMarkersBoundCenter.centerPos}
@@ -108,7 +108,7 @@ const LeafletMapInner = (props: MapInnerProps) => {
           >
             {!isLoading ? (
               <>
-                <ClickedMarker position={clickedPosition} />
+                {/* <ClickedMarker position={clickedPosition} /> */}
                 {Object.values(clustersByCategory).map((item) => (
                   <LeafletCluster
                     key={item.category}
