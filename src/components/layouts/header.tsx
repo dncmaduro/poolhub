@@ -54,7 +54,10 @@ const Header = () => {
   }
 
   return (
-    <div className="sticky top-0 flex h-14 w-full items-center justify-between rounded-b-2xl border border-gray-300 bg-white px-4 shadow-sm">
+    <div
+      style={{ zIndex: '1' }}
+      className="sticky top-0 flex h-14 w-full items-center justify-between rounded-b-2xl border border-gray-300 bg-white px-4 shadow-sm"
+    >
       <div className="flex items-center gap-4">
         <Logo />
         <AddressModal />

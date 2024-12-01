@@ -18,6 +18,8 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { z } from 'zod'
+import Leaflet from 'leaflet'
+import Map from '@/components/map'
 
 const Page = () => {
   const [profile, setProfile] = useState<Profile>()
@@ -25,6 +27,7 @@ const Page = () => {
   const email = useSelector((state: RootState) => state.profile.email)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [currLocation, setCurrLocation] = useState<Leaflet.LatLng | undefined>()
 
   const schema = z.object({
     email: z.string().email(),
@@ -32,7 +35,10 @@ const Page = () => {
     point: z.coerce.number(),
     role: z.string(),
     phone: z.string().optional(),
-    birthyear: z.coerce.number().optional()
+    birthyear: z.coerce.number().optional(),
+    lat: z.coerce.number(),
+    lon: z.coerce.number(),
+    address: z.string()
   })
 
   const form = useForm<z.infer<typeof schema>>({
@@ -43,7 +49,10 @@ const Page = () => {
       point: 0,
       role: '',
       phone: '',
-      birthyear: 0
+      birthyear: 0,
+      lat: 0,
+      lon: 0,
+      address: ''
     }
   })
 
@@ -57,8 +66,15 @@ const Page = () => {
         point: res.point || 0,
         role: res.role || '',
         phone: res.phone || '',
-        birthyear: res.birthyear || 0
+        birthyear: res.birthyear || 0,
+        lat: res.lat || 0,
+        lon: res.lon || 0,
+        address: res.address || ''
       })
+      setCurrLocation({
+        lat: res.lat,
+        lng: res.lon
+      } as Leaflet.LatLng)
     }
   }
 
@@ -74,8 +90,15 @@ const Page = () => {
       point: profile?.point || 0,
       role: profile?.role || '',
       phone: profile?.phone || '',
-      birthyear: profile?.birthyear || 0
+      birthyear: profile?.birthyear || 0,
+      lat: profile?.lat || 0,
+      lon: profile?.lon || 0,
+      address: profile?.address || ''
     })
+    setCurrLocation({
+      lat: profile?.lat,
+      lng: profile?.lon
+    } as Leaflet.LatLng)
   }
 
   const submit = async (values: z.infer<typeof schema>) => {
@@ -84,7 +107,10 @@ const Page = () => {
       values.email,
       values.name,
       values.phone,
-      values.birthyear
+      values.birthyear,
+      values.lat,
+      values.lon,
+      values.address
     )
     if (res) {
       setProfile(res)
@@ -93,6 +119,11 @@ const Page = () => {
     }
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    form.setValue('lat', currLocation?.lat || 0)
+    form.setValue('lon', currLocation?.lng || 0)
+  }, [currLocation, form])
 
   return (
     <MainLayout>
@@ -199,8 +230,38 @@ const Page = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Địa chỉ</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Địa chỉ của bạn"
+                        readOnly={!isEditing}
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              {isEditing && email === profile?.email && (
+                <div>
+                  <span>
+                    Click chọn điểm trên bản đồ để thêm địa chỉ rõ ràng
+                  </span>
+                  <Map
+                    width={800}
+                    height={600}
+                    currLat={currLocation?.lat}
+                    currLng={currLocation?.lng}
+                    setLatLng={setCurrLocation}
+                  />
+                </div>
+              )}
               {isEditing && email === profile?.email ? (
-                <div className="flex gap-8">
+                <div className={`${isEditing && 'mt-[600px]'} z-20 flex gap-8`}>
                   <Button className="w-[200px]" disabled={isLoading}>
                     Cập nhật
                   </Button>
@@ -215,7 +276,7 @@ const Page = () => {
                 </div>
               ) : (
                 <Button
-                  className="w-[200px]"
+                  className={`${isEditing && 'mt-[600px]'} w-[200px]`}
                   type="button"
                   onClick={() => setIsEditing(true)}
                 >

@@ -78,11 +78,14 @@ export const useProfile = () => {
     email: string,
     name: string,
     phone?: string,
-    birthyear?: number
+    birthyear?: number,
+    lat?: number,
+    lon?: number,
+    address?: string
   ) => {
     const { data, error } = await supabase
       .from('profile')
-      .update({ name, phone, birthyear })
+      .update({ name, phone, birthyear, lat, lon, address })
       .eq('email', email)
       .select()
     if (data) {

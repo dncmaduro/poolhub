@@ -24,6 +24,9 @@ export type Profile = {
   role: string
   phone: string | null
   birthyear: number | null
+  lat: number | null
+  lon: number | null
+  address: string
 }
 
 export type Match = {
