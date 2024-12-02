@@ -16,10 +16,11 @@ import { Profile } from '@/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import Leaflet from 'leaflet'
 import Map from '@/components/map'
+import { setProfile as setNewProfile } from '@/store/profileSlice'
 
 const Page = () => {
   const [profile, setProfile] = useState<Profile>()
@@ -28,6 +29,7 @@ const Page = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [currLocation, setCurrLocation] = useState<Leaflet.LatLng | undefined>()
+  const dispatch = useDispatch()
 
   const schema = z.object({
     email: z.string().email(),
@@ -116,6 +118,7 @@ const Page = () => {
       setProfile(res)
       setIsEditing(false)
       fetchProfile()
+      dispatch(setNewProfile(res))
     }
     setIsLoading(false)
   }

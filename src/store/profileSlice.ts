@@ -29,11 +29,14 @@ const profileSlice = createSlice({
   name: 'profile',
   initialState,
   reducers: {
-    setProfile: (state, action: PayloadAction<State>) => {
+    setProfile: (state, action) => {
       state.email = action.payload.email
       state.name = action.payload.name
       state.role = action.payload.role
-      state.address = action.payload.address
+      state.address = {
+        lat: action.payload.lat,
+        lon: action.payload.lon
+      }
     },
     setAddress: (state, action: PayloadAction<Address>) => {
       state.address = action.payload

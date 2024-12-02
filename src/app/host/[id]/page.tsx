@@ -32,7 +32,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { urlToPoolMap } from '@/helpers'
+import { isAddressFilled, urlToPoolMap } from '@/helpers'
 import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
@@ -211,6 +211,8 @@ const Page = () => {
     }
   ]
 
+  console.log(address)
+
   return (
     <MainLayout>
       <div className="mx-auto mt-10 flex w-[1280px] max-w-full flex-col gap-8">
@@ -227,10 +229,16 @@ const Page = () => {
                 <span>{club.address}</span>
               </Link>
               <Link
-                href={urlToPoolMap(address, { lat: club.lat, lon: club.lon })}
+                href={
+                  isAddressFilled(address)
+                    ? urlToPoolMap(address, { lat: club.lat, lon: club.lon })
+                    : '/profile'
+                }
               >
                 <Button size="sm" className="mt-4">
-                  Xem đường đi
+                  {isAddressFilled(address)
+                    ? 'Xem đường đi'
+                    : 'Nhập địa chỉ để dùng chức năng xem đường đi'}
                 </Button>
               </Link>
               <div className="mt-4 flex items-center gap-2 text-lg">
