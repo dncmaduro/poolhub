@@ -76,11 +76,13 @@ export const useClub = () => {
   const createClub = async (
     host_email: string,
     name: string,
-    address: string
+    address: string,
+    lat?: number,
+    lon?: number
   ) => {
     const { data, error } = await supabase
       .from('place')
-      .insert({ name, host_email, address })
+      .insert({ name, host_email, address, lat, lon })
       .select()
     if (data) {
       toast({

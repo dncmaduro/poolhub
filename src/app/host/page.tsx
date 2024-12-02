@@ -25,12 +25,15 @@ import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { z } from 'zod'
+import Map from '@/components/map'
+import Leaflet from 'leaflet'
 
 const Page = () => {
   const email = useSelector((state: RootState) => state.profile.email)
   const [clubBlocks, setClubBlocks] = useState<ReactNode[]>()
   const { getHostClubs, createClub } = useClub()
   const [isDialogLoading, setIsDialogLoading] = useState<boolean>(false)
+  const [currLocation, setCurrLocation] = useState<Leaflet.LatLng | undefined>()
 
   const fetchClubs = async () => {
     const res = await getHostClubs(email)
@@ -68,10 +71,15 @@ const Page = () => {
 
   const submit = async (values: z.infer<typeof schema>) => {
     setIsDialogLoading(true)
-    await createClub(email, values.name, values.address)
+    await createClub(email, values.name, values.address, values.lat, values.lon)
     await fetchClubs()
     setIsDialogLoading(false)
   }
+
+  useEffect(() => {
+    form.setValue('lat', currLocation?.lat || 0)
+    form.setValue('lon', currLocation?.lng || 0)
+  }, [currLocation, form])
 
   useEffect(() => {
     fetchClubs()
@@ -87,8 +95,10 @@ const Page = () => {
               <Button>Tạo câu lạc bộ mới</Button>
             </DialogTrigger>
             <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
-            <DialogContent className="fixed left-1/2 top-1/2 w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg">
-              <DialogTitle>Câu lạc bộ mới</DialogTitle>
+            <DialogContent className="fixed left-1/2 top-1/2 flex h-[600px] w-[700px] max-w-[700px] flex-col rounded-md bg-white p-6 shadow-lg">
+              <DialogTitle className="h-fit max-h-fit">
+                Câu lạc bộ mới
+              </DialogTitle>
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(submit)}
@@ -116,29 +126,25 @@ const Page = () => {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="lat"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Địa chỉ</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Vĩ độ" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    name="lon"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Địa chỉ</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Kinh độ" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button disabled={isDialogLoading}>Tạo</Button>
+                  <div>
+                    <span>
+                      Click chọn điểm trên bản đồ để thêm địa chỉ rõ ràng
+                    </span>
+                    <Map
+                      width={650}
+                      height={300}
+                      currLat={currLocation?.lat}
+                      currLng={currLocation?.lng}
+                      setLatLng={setCurrLocation}
+                    />
+                  </div>
+                  <Button
+                    disabled={isDialogLoading}
+                    className="mb-4 mt-[300px]"
+                    style={{ zIndex: '1' }}
+                  >
+                    Tạo
+                  </Button>
                 </form>
               </Form>
             </DialogContent>
