@@ -31,9 +31,6 @@ export const useMatch = () => {
     clubs?: string,
     page?: number
   ) => {
-    const foundClubs = await searchClubs(clubs || '')
-    const clubIds = foundClubs?.map((club) => club.id)
-
     const foundProfiles = await searchProfiles(name || '')
     const profileIds = foundProfiles?.map((profile) => profile.id)
 
@@ -41,6 +38,9 @@ export const useMatch = () => {
     const realPage = page || 1
 
     if (clubs) {
+      const foundClubs = await searchClubs(clubs)
+      const clubIds = foundClubs?.map((club) => club.id)
+
       const { data, error } = await supabase
         .from('match')
         .select('*')

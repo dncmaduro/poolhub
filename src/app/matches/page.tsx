@@ -132,7 +132,7 @@ const Page = () => {
             )}
           />
           <FormField
-            name="address"
+            name="clubs"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tên câu lạc bộ</FormLabel>
