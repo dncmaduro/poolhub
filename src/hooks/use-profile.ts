@@ -12,10 +12,10 @@ export const useProfile = () => {
   const { toast } = useToast()
   const dispatch = useDispatch()
 
-  const createProfile = async (email: string, name: string) => {
+  const createProfile = async (email: string, name: string, role?: string) => {
     const { data, error } = await supabase
       .from('profile')
-      .insert([{ email, name, role: 'user' }])
+      .insert([{ email, name, role: role ?? 'user' }])
       .select()
     if (data) {
       return data

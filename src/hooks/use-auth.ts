@@ -14,13 +14,22 @@ export const useAuth = () => {
   const { createProfile, getProfile } = useProfile()
   const dispatch = useDispatch()
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    name: string,
+    role?: string
+  ) => {
     const { data: existData } = await supabase
       .from('account')
       .select('*')
       .eq('email', email)
     if (existData && existData.length > 0) {
-      const data2 = await createProfile(email, name)
+      const data2 = await createProfile(
+        email,
+        name,
+        role === undefined ? 'user' : role
+      )
       if (data2) {
         toast({
           title: 'Đăng kí thành công'
