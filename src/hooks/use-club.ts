@@ -82,7 +82,7 @@ export const useClub = () => {
   ) => {
     const { data, error } = await supabase
       .from('place')
-      .insert({ name, host_email, address, lat, lon })
+      .insert({ name, host_email, address, lat, lon, status: 'pending' })
       .select()
     if (data) {
       toast({
@@ -98,5 +98,32 @@ export const useClub = () => {
     }
   }
 
-  return { getClubs, getClub, searchClubs, getHostClubs, createClub }
+  const updateStatusClub = async (id: number, status: string) => {
+    const { data, error } = await supabase
+      .from('place')
+      .update({ status })
+      .eq('id', id)
+      .select()
+    if (data) {
+      toast({
+        title: 'Cập nhật trạng thái câu lạc bộ thành công!'
+      })
+      return data
+    } else {
+      toast({
+        title: 'Cập nhật trạng thái không thành công!',
+        description: error.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return {
+    getClubs,
+    getClub,
+    searchClubs,
+    getHostClubs,
+    createClub,
+    updateStatusClub
+  }
 }

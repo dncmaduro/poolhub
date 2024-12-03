@@ -5,6 +5,7 @@ export type Club = {
   host_email: string
   lat: number
   lon: number
+  status: string
 }
 
 export type Competition = {
