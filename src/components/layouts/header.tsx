@@ -93,11 +93,20 @@ const Header = () => {
                 Hồ sơ
               </Button>
             </Link>
-            <Link href="/host">
-              <Button variant="ghost" size="sm" className="w-full">
-                Trang quản lý
-              </Button>
-            </Link>
+            {role === 'host' && (
+              <Link href="/host">
+                <Button variant="ghost" size="sm" className="w-full">
+                  Trang quản lý
+                </Button>
+              </Link>
+            )}
+            {role === 'admin' && (
+              <Link href="/admin">
+                <Button variant="ghost" size="sm" className="w-full">
+                  Trang quản lý
+                </Button>
+              </Link>
+            )}
             <Button
               variant="ghost"
               size="sm"
