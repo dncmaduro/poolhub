@@ -1,6 +1,6 @@
 'use client'
 
-import { Club } from '@/types'
+import { Club, Profile } from '@/types'
 import { CompetitionBlock } from '@/components/home/competition-block'
 import { MatchBlock } from '@/components/home/match-block'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { useClub } from '@/hooks/use-club'
 import { useCompetition } from '@/hooks/use-competition'
 import { useMatch } from '@/hooks/use-match'
 import MainLayout from '@/layouts/main'
-import { Calendar1, Mail, MapPin } from 'lucide-react'
+import { Calendar1, Mail, MapPin, Star } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 import {
@@ -37,6 +37,17 @@ import Link from 'next/link'
 import { urlToPoolMap } from '@/helpers'
 import { RootState } from '@/store'
 import { useSelector } from 'react-redux'
+import { useRating } from '@/hooks/use-rating'
+import { Textarea } from '@/components/ui/textarea'
+import { useProfile } from '@/hooks/use-profile'
+import { RatingBox } from '@/components/rating/rating-box'
+
+type Rating = {
+  profile_id: number
+  place_id: number
+  rating: number
+  comment?: string
+}
 
 const Page = () => {
   const params = useParams()
@@ -49,6 +60,13 @@ const Page = () => {
   const { createPreorder } = usePreorder()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const address = useSelector((state: RootState) => state.profile.address)
+  const { createRating, checkRating, getRatings } = useRating()
+  const email = useSelector((state: RootState) => state.profile.email)
+  const { getProfile } = useProfile()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [canRate, setCanRate] = useState<boolean>(false)
+  const [ratings, setRatings] = useState<Rating[]>([])
+  const [avg, setAvg] = useState<number>(0)
 
   useEffect(() => {
     const fetchClub = async () => {
@@ -99,9 +117,34 @@ const Page = () => {
       }
     }
 
+    const fetchProfile = async () => {
+      const res = await getProfile(email)
+      if (res) {
+        setProfile(res)
+      }
+    }
+
+    const fetchCanRate = async () => {
+      const res = await checkRating(profile ? profile.id : 0, Number(params.id))
+      if (res) {
+        setCanRate(res)
+      }
+    }
+
+    const fetchRatings = async () => {
+      const res = await getRatings(Number(params.id))
+      if (res) {
+        setRatings(res.data)
+        setAvg(res.avg)
+      }
+    }
+
     fetchClub()
     fetchCompetitons()
     fetchMatches()
+    fetchProfile()
+    fetchCanRate()
+    fetchRatings()
   }, [])
 
   const schema = z.object({
@@ -121,7 +164,31 @@ const Page = () => {
     setIsLoading(false)
   }
 
-  console.log(address)
+  const ratingSchema = z.object({
+    rating: z.coerce.number(),
+    comment: z.string().optional()
+  })
+
+  const ratingForm = useForm<z.infer<typeof ratingSchema>>({
+    resolver: zodResolver(ratingSchema),
+    defaultValues: {
+      rating: 0,
+      comment: undefined
+    }
+  })
+
+  const ratingSubmit = async (values: z.infer<typeof ratingSchema>) => {
+    setIsLoading(true)
+    if (profile) {
+      await createRating(
+        profile.id,
+        Number(params.id),
+        values.rating,
+        values.comment
+      )
+    }
+    setIsLoading(false)
+  }
 
   return (
     <MainLayout>
@@ -203,8 +270,89 @@ const Page = () => {
                   </Form>
                 </DialogContent>
               </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  {canRate && (
+                    <Button className="mt-6" variant="outline">
+                      Đánh giá
+                    </Button>
+                  )}
+                </DialogTrigger>
+                <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
+
+                <DialogContent className="fixed left-1/2 top-1/2 w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-6 shadow-lg">
+                  <DialogTitle>Đánh giá</DialogTitle>
+                  <Form {...ratingForm}>
+                    <form
+                      className="mt-10 flex flex-col gap-4"
+                      onSubmit={ratingForm.handleSubmit(ratingSubmit)}
+                    >
+                      <FormField
+                        name="rating"
+                        render={({ field }) => {
+                          const handleStarClick = (rating: number) => {
+                            field.onChange(rating)
+                          }
+
+                          return (
+                            <div className="flex space-x-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => handleStarClick(star)}
+                                  className="p-1"
+                                >
+                                  <Star
+                                    size={24}
+                                    color={
+                                      star <= field.value
+                                        ? '#FFD700'
+                                        : '#D3D3D3'
+                                    }
+                                    fill={
+                                      star <= field.value ? '#FFD700' : 'none'
+                                    }
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          )
+                        }}
+                      />
+                      <FormField
+                        name="comment"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Bình luận</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <Button>Gửi đánh giá</Button>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </>
           )}
+          <span className="my-10 mt-6">
+            {avg === 0
+              ? 'Chưa có đánh giá nào'
+              : `${avg} sao / ${ratings.length} lượt đánh giá`}
+          </span>
+          <div>
+            {ratings.map((rating, index) => (
+              <RatingBox
+                key={index}
+                profile_id={rating.profile_id}
+                rating={rating.rating}
+                comment={rating.comment}
+              />
+            ))}
+          </div>
         </div>
         <div className="ml-auto flex flex-col">
           <span>Các giải đấu đang diễn ra tại câu lạc bộ này</span>
